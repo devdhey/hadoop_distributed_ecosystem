@@ -24,5 +24,22 @@
     <name>mapreduce.reduce.java.opts</name>
     <value>-Xmx640m</value> <!-- Opções JVM para tarefas de redução (80% da RAM alocada) -->
   </property> <!-- isso evita erros de memoria fisica -->
+
+  <!-- Caminho para o hadoop escutar a pasta correta -->
+  <property>
+    <name>yarn.app.mapreduce.am.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value> <!-- Define a variável de ambiente HADOOP_MAPRED_HOME para o Application Master do MapReduce, apontando para o diretório de instalação do Hadoop. Ajuste o caminho conforme necessário para refletir a estrutura do seu ambiente. -->
+  </property>
+
+  <property>
+    <name>mapreduce.map.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value> <!-- Define a variável de ambiente HADOOP_MAPRED_HOME para as tarefas de mapeamento, apontando para o diretório de instalação do Hadoop. Ajuste o caminho conforme necessário para refletir a estrutura do seu ambiente. -->
+  </property>
+
+  <property>
+    <name>mapreduce.reduce.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value> <!-- Define a variável de ambiente HADOOP_MAPRED_HOME para as tarefas de redução, apontando para o diretório de instalação do Hadoop. Ajuste o caminho conforme necessário para refletir a estrutura do seu ambiente. -->
+  </property>
+
   
 </configuration>
