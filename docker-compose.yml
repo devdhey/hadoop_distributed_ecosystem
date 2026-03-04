@@ -113,6 +113,8 @@ services:
       - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
     depends_on:
       - resourcemanager
+    ports:
+      - "8042:8042" #acessível via localhost:8042
     networks:
       - hadoop-net
 
@@ -132,6 +134,8 @@ services:
       - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
     depends_on:
       - resourcemanager
+    ports:
+      - "8043:8042" # acessivel via localhost:8043
     networks:
       - hadoop-net
     

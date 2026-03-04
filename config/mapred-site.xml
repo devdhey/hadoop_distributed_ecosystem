@@ -51,5 +51,29 @@
     <value>HADOOP_MAPRED_HOME=/opt/hadoop</value> <!-- Define a variável de ambiente HADOOP_MAPRED_HOME para as tarefas de redução, apontando para o diretório de instalação do Hadoop. Ajuste o caminho conforme necessário para refletir a estrutura do seu ambiente. -->
   </property>
 
-  
+<!-- CONFIG DE PERSISTENCIA DE LOGS (JOBHISTORY SERVER )-->
+  <!-- Como é um ambiente de estudo não vou utilizar para não sobrecarregar a memoria-->
+  <!-- 
+<property>
+  <name>mapreduce.jobhistory.address</name>
+  <value>namenode:10020</value> # Endereço onde o JobHistory Server escutará as conexões, ajuste conforme necessário para refletir a configuração do seu cluster.
+</property>
+
+<property> 
+  <name>mapreduce.jobhistory.webapp.address</name>
+  <value>namenode:19888</value>
+</property>
+
+<property>
+  <name>mapreduce.jobhistory.intermediate-done-dir</name>
+  <value>mr-history/tmp</value>
+</property>
+
+<property>
+  <name>mapreduce.jobhistory.done-dir</name>
+  <value>/mr-history/done</value>
+</property>
+-->
+
+
 </configuration>
