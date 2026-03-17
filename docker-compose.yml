@@ -1,145 +1,204 @@
-#FASE 1 
+x-hadoop-common: &hadoop-common
+  image: apache/hadoop:3.3.6
+  user: root
+  environment:
+    HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+  volumes:
+    - ./hadoop/hadoop-config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+    - ./hadoop/hadoop-config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+    - ./hadoop/hadoop-config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+    - ./hadoop/hadoop-config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
+    - ./hadoop/hadoop-config/workers:/opt/hadoop/etc/hadoop/workers
+    - ./hadoop/hadoop-config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+  networks:
+    - hadoop-net
+  restart: unless-stopped
+
 services:
 
+  # --- HADOOP INFRASTRUCTURE ---
+
   namenode:
-    image: apache/hadoop:3.3.6
+    <<: *hadoop-common
     container_name: namenode
-    user: root
     hostname: namenode
-    #command: >
-     # sh -c "if [ ! -d /hadoop/dfs/name/current ]; then
-      #         /opt/hadoop/bin/hdfs namenode -format -force;
-       #      fi;
-        #     /opt/hadoop/bin/hdfs namenode"
-    #A versão abaixo ela é mais segura em produção
-    #pois caso o volume falhe ou esteja vazio por algum motivo, ele não recria outro.
-    command: >
-      bash -c " if [ ! -f /hadoop/dfs/name/current/VERSION ]; then
-                  echo 'Formatting NameNode...'; hdfs namenode -format -force;
-                fi && hdfs namenode"
-    environment:
-      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-    volumes:
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
-      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-      - ./config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
-      - ./config/workers:/opt/hadoop/etc/hadoop/workers
-      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
-      - namenode_data:/hadoop/dfs/name
     ports:
       - "9870:9870"
       - "8020:8020"
-    networks:
-      - hadoop-net
+    entrypoint: ["/bin/bash", "/scripts/entrypoint-namenode.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "hdfs dfsadmin -safemode get | grep -q OFF"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - ./hadoop/hadoop-config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop/hadoop-config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./hadoop/hadoop-config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./hadoop/hadoop-config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
+      - ./hadoop/hadoop-config/workers:/opt/hadoop/etc/hadoop/workers
+      - ./hadoop/hadoop-config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./scripts/entrypoint-namenode.sh:/scripts/entrypoint-namenode.sh
+      - namenode_data:/hadoop/dfs/name
 
   datanode1:
-    image: apache/hadoop:3.3.6
+    <<: *hadoop-common
     container_name: datanode1
-    user: root
     hostname: datanode1
     command: ["hdfs", "datanode"]
-    environment:
-      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-    volumes:
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
-      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-      - ./config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
-      - ./config/workers:/opt/hadoop/etc/hadoop/workers
-      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
-      - datanode1_data:/hadoop/dfs/data
     depends_on:
-      - namenode
-    networks:
-      - hadoop-net
+      namenode:
+        condition: service_started
+    volumes:
+      - ./hadoop/hadoop-config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop/hadoop-config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./hadoop/hadoop-config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./hadoop/hadoop-config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
+      - ./hadoop/hadoop-config/workers:/opt/hadoop/etc/hadoop/workers
+      - ./hadoop/hadoop-config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - datanode1_data:/hadoop/dfs/data
 
   datanode2:
-    image: apache/hadoop:3.3.6
+    <<: *hadoop-common
     container_name: datanode2
-    user: root
     hostname: datanode2
     command: ["hdfs", "datanode"]
-    environment:
-      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-    volumes:
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
-      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-      - ./config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
-      - ./config/workers:/opt/hadoop/etc/hadoop/workers
-      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
-      - datanode2_data:/hadoop/dfs/data
     depends_on:
-      - namenode
-    networks:
-      - hadoop-net
+      namenode:
+        condition: service_started
+    volumes:
+      - ./hadoop/hadoop-config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop/hadoop-config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./hadoop/hadoop-config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./hadoop/hadoop-config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
+      - ./hadoop/hadoop-config/workers:/opt/hadoop/etc/hadoop/workers
+      - ./hadoop/hadoop-config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - datanode2_data:/hadoop/dfs/data
 
   resourcemanager:
-    image: apache/hadoop:3.3.6
+    <<: *hadoop-common
     container_name: resourcemanager
-    user: root
     hostname: resourcemanager
     command: ["yarn", "resourcemanager"]
-    environment:
-      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-    volumes:
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
-      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-      - ./config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
-      - ./config/workers:/opt/hadoop/etc/hadoop/workers
-      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
     ports:
       - "8383:8088"
     depends_on:
-      - namenode
-    networks:
-      - hadoop-net
+      namenode:
+        condition: service_healthy
 
   nodemanager1:
-    image: apache/hadoop:3.3.6
+    <<: *hadoop-common
     container_name: nodemanager1
     hostname: nodemanager1
     command: ["yarn", "nodemanager"]
-    environment:
-      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-    volumes:
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
-      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-      - ./config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
-      - ./config/workers:/opt/hadoop/etc/hadoop/workers
-      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
-    depends_on:
-      - resourcemanager
     ports:
-      - "8042:8042" #acessível via localhost:8042
-    networks:
-      - hadoop-net
+      - "8042:8042"
+    depends_on:
+      resourcemanager:
+        condition: service_started
 
   nodemanager2:
-    image: apache/hadoop:3.3.6
+    <<: *hadoop-common
     container_name: nodemanager2
     hostname: nodemanager2
     command: ["yarn", "nodemanager"]
-    environment:
-      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
-    volumes:
-      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
-      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
-      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
-      - ./config/capacity-scheduler.xml:/opt/hadoop/etc/hadoop/capacity-scheduler.xml
-      - ./config/workers:/opt/hadoop/etc/hadoop/workers
-      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
-    depends_on:
-      - resourcemanager
     ports:
-      - "8043:8042" # acessivel via localhost:8043
+      - "8043:8042"
+    depends_on:
+      resourcemanager:
+        condition: service_started
+
+  # --- HIVE COMPONENT ---
+
+  hive-postgres:
+    image: postgres:15
+    container_name: hive-postgres
+    environment:
+      POSTGRES_DB: 'metastore'
+      POSTGRES_USER: 'hive'
+      POSTGRES_PASSWORD: 'hive'
+    command: postgres -c password_encryption=md5
+    ports:
+      - "5487:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hive -d metastore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - hive_postgres_data:/var/lib/postgresql/data
     networks:
       - hadoop-net
-    
-  #FASE 2 adicionar um componente HIVE 
+    restart: unless-stopped
+
+  hive-metastore:
+    image: apache/hive:4.0.0
+    container_name: hive-metastore
+    environment:
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+      TEZ_CONF_DIR: /opt/hive/conf
+      HIVE_CONF_DIR: /opt/hive/conf
+      SERVICE_NAME: metastore
+      DB_DRIVER: postgres
+    env_file:
+      - ./hadoop/hadoop-config/hadoop.env
+      - ./hive/hive-config/hive.env
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9083"]
+      interval: 30s # Espera 30 segundos entre cada tentativa
+      timeout: 5s # Timeout de 5 segundos
+      retries: 5 # Tenta 5 vezes antes de desistir
+    volumes:
+      - ./drivers/postgresql-42.7.3.jar:/opt/hive/lib/postgresql-42.7.3.jar
+      - ./hive/hive-config/hive-site.xml:/opt/hive/conf/hive-site.xml
+      - ./hive/hive-config/tez-site.xml:/opt/hive/conf/tez-site.xml
+      - ./hadoop/hadoop-config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop/hadoop-config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./hadoop/hadoop-config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./hadoop/hadoop-config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+    ports:
+      - "9083:9083"
+    depends_on:
+      hive-postgres:
+        condition: service_healthy
+      namenode:
+        condition: service_healthy
+    networks:
+      - hadoop-net
+
+  hive-server:
+    image: apache/hive:4.0.0
+    container_name: hive-server
+    hostname: hive-server
+    environment:
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+      TEZ_CONF_DIR: /opt/hive/conf
+      HIVE_CONF_DIR: /opt/hive/conf
+      SERVICE_NAME: hiveserver2
+      DB_DRIVER: postgres
+    env_file:
+      - ./hadoop/hadoop-config/hadoop.env
+      - ./hive/hive-config/hive.env
+    volumes:
+      - ./hive/hive-config/hive-site.xml:/opt/hive/conf/hive-site.xml
+      - ./hive/hive-config/tez-site.xml:/opt/hive/conf/tez-site.xml
+      - ./hadoop/hadoop-config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./hadoop/hadoop-config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./hadoop/hadoop-config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./hadoop/hadoop-config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./drivers/postgresql-42.7.3.jar:/opt/hive/lib/postgresql.jar
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    restart: unless-stopped
+    depends_on:
+      hive-metastore:
+        condition: service_healthy
+      resourcemanager:
+        condition: service_started
+    networks:
+      - hadoop-net
 
 networks:
   hadoop-net:
@@ -149,3 +208,4 @@ volumes:
   namenode_data:
   datanode1_data:
   datanode2_data:
+  hive_postgres_data:

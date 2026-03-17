@@ -25,6 +25,10 @@ O Hadoop é dividido em três camadas principais:
 *   **NameNode (O Mestre):**
     *   **Função:** Mantém o "mapa" de onde cada pedaço de arquivo está. Gerencia os metadados (nomes de arquivos, permissões, localização dos blocos).
     *   **No seu projeto:** Configurado em `core-site.xml` como `hdfs://namenode:8020`.
+    *   - Por padrão o namenode tem o safemode ativo, que em ambientes gigantescos é muito bom para evitar corrupção de dados generalizada
+    *   - Em produção nunca force a saída do Safe mode -> ```docker exec -it namenode hdfs dfsadmin -safemode leave```
+    *   - Para reativar o SafeMode -> ```docker exec -it namenode hdfs dfsadmin -safemode enter```
+    *   - Se esquece o estado atual do SafeMode -> ```docker exec -it namenode hdfs dfsadmin -safemode get```
 *   **DataNode (O Escravo/Trabalhador):**
     *   **Função:** Armazena os dados reais em blocos. Executa operações de leitura e escrita a pedido dos clientes e do NameNode.
     *   **No seu projeto:** Você possui `datanode1` e `datanode2` listados no arquivo `workers`.

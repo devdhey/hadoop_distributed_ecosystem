@@ -1,0 +1,82 @@
+<configuration>
+  <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+  </property>
+
+  <!-- Definindo o quanto de memoria cada tarefa do map reduce pode usar -->
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>800</value> <!-- Quantidade de RAM que cada tarefa de mapeamento pode usar -->
+  </property>
+
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>800</value> <!-- Quantidade de RAM que cada tarefa de redução pode usar -->
+  </property>
+
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx640m</value> <!-- Opções JVM para tarefas de mapeamento (80% da RAM alocada) -->
+  </property> <!-- isso evita erros de memoria fisica -->
+
+  <property>
+    <name>mapreduce.reduce.java.opts</name>
+    <value>-Xmx640m</value> <!-- Opções JVM para tarefas de redução (80% da RAM alocada) -->
+  </property> <!-- isso evita erros de memoria fisica -->
+
+  <property>
+    <name>yarn.app.mapreduce.am.resource.mb</name>
+    <value>512</value> <!-- Quantidade de RAM que o Application Master do MapReduce pode usar -->
+  </property>
+
+  <property>
+    <name>yarn.app.mapreduce.am.command-opts</name>
+    <value>-Xmx400m</value> <!-- Opções JVM para o Application Master do MapReduce (80% da RAM alocada) -->
+  </property>
+
+  <!-- Caminho para o hadoop escutar a pasta correta -->
+  <property>
+    <name>yarn.app.mapreduce.am.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value> <!-- Define a variável de ambiente HADOOP_MAPRED_HOME para o Application Master do MapReduce, apontando para o diretório de instalação do Hadoop. Ajuste o caminho conforme necessário para refletir a estrutura do seu ambiente. -->
+  </property>
+
+  <property>
+    <name>mapreduce.map.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value> <!-- Define a variável de ambiente HADOOP_MAPRED_HOME para as tarefas de mapeamento, apontando para o diretório de instalação do Hadoop. Ajuste o caminho conforme necessário para refletir a estrutura do seu ambiente. -->
+  </property>
+
+  <property>
+    <name>mapreduce.reduce.env</name>
+    <value>HADOOP_MAPRED_HOME=/opt/hadoop</value> <!-- Define a variável de ambiente HADOOP_MAPRED_HOME para as tarefas de redução, apontando para o diretório de instalação do Hadoop. Ajuste o caminho conforme necessário para refletir a estrutura do seu ambiente. -->
+  </property>
+
+<!-- CONFIG DE PERSISTENCIA DE LOGS (JOBHISTORY SERVER )-->
+  <!-- Como é um ambiente de estudo não vou utilizar para não sobrecarregar a memoria-->
+  <!-- 
+<property>
+  <name>mapreduce.jobhistory.address</name>
+  <value>namenode:10020</value> # Endereço onde o JobHistory Server escutará as conexões, ajuste conforme necessário para refletir a configuração do seu cluster.
+</property>
+
+<property> 
+  <name>mapreduce.jobhistory.webapp.address</name>
+  <value>namenode:19888</value>
+</property>
+
+<property>
+  <name>mapreduce.jobhistory.intermediate-done-dir</name>
+  <value>mr-history/tmp</value>
+</property>
+
+<property>
+  <name>mapreduce.jobhistory.done-dir</name>
+  <value>/mr-history/done</value>
+</property>
+-->
+
+
+</configuration>
+
+<!-- o mapred-site.xml é o arquivo que define as configurações do MapReduce, 
+como a quantidade de memória que cada tarefa pode usar, o caminho para o hadoop escutar a pasta correta, etc-->

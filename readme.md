@@ -9,7 +9,7 @@ Este ambiente faz parte de um laboratório de engenharia de dados voltado ao est
 
 ## Arquitetura do Cluster
 
-O cluster é composto por duas camadas principais.
+O cluster é composto por três camadas principais.
 
 ### HDFS — Camada de Armazenamento
 
@@ -28,6 +28,17 @@ O cluster é composto por duas camadas principais.
 - **NodeManager 1 e NodeManager 2**  
   Executam tarefas distribuídas em cada nó do cluster.
 
+### Hive — Camada de SQL / Data Warehouse
+
+- **Hive Server2**  
+  Interface para execução de consultas SQL (HQL) via JDBC/Thrift.
+
+- **Hive Metastore**  
+  Gerencia o catálogo de metadados das tabelas do Hive.
+
+- **Hive Postgres**  
+  Banco de dados relacional que armazena os metadados do Metastore.
+
 ---
 
 ## Estrutura de Arquivos
@@ -36,45 +47,36 @@ Certifique-se de que a estrutura do projeto esteja organizada da seguinte forma:
 
 .
 ├── docker-compose.yml
-└── config/
-├── capacity-scheduler.xml
-├── core-site.xml
-├── hdfs-site.xml
-├── mapred-site.xml
-├── yarn-site.xml
-└── workers
+├── hadoop/
+│   └── hadoop-config/
+│       ├── core-site.xml
+│       ├── hdfs-site.xml
+│       ├── yarn-site.xml
+│       └── hadoop.env
+└── hive/
+    └── hive-config/
+        ├── hive-site.xml
+        ├── tez-site.xml
+        └── hive.env
 
 
 ---
 
 ## Como Executar
 
-### 1. Pré-requisitos
-
-- Docker instalado
-- Docker Compose instalado
-- Mínimo de 4GB de RAM dedicados ao Docker  
-- Recomendado: 8GB para estabilidade do cluster
-
----
+### 1. Configuração de Ambiente
+Antes de rodar o cluster, configure seus arquivos de ambiente:
+```bash
+cp hadoop/hadoop-config/hadoop.env.example library/hadoop-config/hadoop.env
+cp hive/hive-config/hive.env.example hive/hive-config/hive.env
+```
 
 ### 2. Iniciar o Cluster
 
 No diretório raiz do projeto, execute:
-
+```bash
 docker-compose up -d
-
-
-Na primeira execução, o NameNode será formatado automaticamente.
-
----
-
-### 3. Verificar o Status dos Containers
-
-docker ps
-
-
-Aguarde alguns instantes até que todos os serviços estejam em execução.
+```
 
 ---
 
@@ -86,61 +88,17 @@ O cluster fornece interfaces gráficas para monitoramento operacional.
 |---|---|---|
 | HDFS NameNode | http://localhost:9870 | Status do sistema de arquivos |
 | YARN ResourceManager | http://localhost:8383 | Monitoramento de jobs e recursos |
+| Hive Server2 UI | http://localhost:10002 | Interface Web do Hive Server |
 
 ---
 
-## Operações Básicas
+## Ajuda e Comandos (Cheat Sheets)
 
-### Acessar o container do NameNode
+Para auxiliar na construção e verificação do projeto, foram criados arquivos de dicas (Cheat Sheets):
 
-docker exec -it namenode bash
-
-
----
-
-### Criar diretório no HDFS
-
-hdfs dfs -mkdir -p /user/admin/input
-
-
----
-
-### Listar conteúdo do HDFS
-
-hdfs dfs -ls /
-
-
----
-
-### Executar Job de Exemplo (MapReduce)
-
-Dentro do container do NameNode:
-
-hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar pi 2 5
-
-
-Este comando executa um job de exemplo para validação do processamento distribuído.
-
----
-
-## Configurações Importantes
-
-### Formatação Segura do NameNode
-O ambiente inclui verificação automática para evitar reformatar o NameNode em reinicializações, preservando dados persistidos.
-
-### Rede Interna Dedicada
-Os containers se comunicam através da rede bridge:
-
-hadoop-net
-
-
-A comunicação ocorre via hostname entre os serviços.
-
-### Persistência de Dados
-Volumes Docker garantem que os dados permaneçam após reinicializações:
-
-- namenode_data
-- datanode_data
+- [Hive Server2](cheat_sheet/hive-server2.md)
+- [Hive Metastore](cheat_sheet/hive-metastore.md)
+- [Hive Postgres](cheat_sheet/hive-postgres.md)
 
 ---
 
@@ -150,21 +108,17 @@ Este cluster foi projetado como ambiente de laboratório para:
 
 - Estudo de arquitetura distribuída
 - Compreensão do funcionamento interno do HDFS
-- Execução de processamento distribuído com YARN
-- Base para integração futura com ferramentas de engenharia de dados
-
-Este ambiente servirá como fundação para pipelines mais avançadas e simulação de cenários reais de processamento de dados em larga escala.
+- Execução de processamento distribuído com YARN e Hive
+- Base para integração futura com ferramentas de engenharia de dados (Spark, Airflow)
 
 ---
 
 ## Próxima Fase
 
-### Fase 2 — Integração com Hive
+### Fase 3 — Processamento Distribuído com Spark
 
-A próxima etapa do projeto incluirá:
-
-- Integração com Apache Hive
-- Criação de Data Warehouse sobre HDFS
-- Execução de consultas SQL distribuídas
-- Base para modelagem analítica em ambiente Hadoop
+A próxima etapa incluirá:
+- Integração do Apache Spark com o Hive Metastore
+- Execução de jobs Spark em modo YARN
+- Pipelines de processamento in-memory
 

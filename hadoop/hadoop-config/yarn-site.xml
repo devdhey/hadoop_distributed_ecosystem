@@ -1,0 +1,69 @@
+<configuration>
+  <property>
+    <name>yarn.resourcemanager.hostname</name>
+    <value>resourcemanager</value>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+  </property>
+ 
+  <!-- Configurações de memória para o YARN -->
+  <!-- No mundo do Hadoop, a unidade padrão para essas configurações de memória é o Megabyte (MB). -->
+
+  <property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>2048</value> <!-- Quantidade total de RAM que cada NodeManager pode usar para executar containers do YARN -->
+  </property>
+  <!-- Configurações de alocação de memória para os containers do YARN -->
+  <property>
+    <name>yarn.scheduler.maximum-allocation-mb</name>
+    <value>1024</value> <!-- Alocação máxima de RAM para cada container do YARN/ deve ser menor ou igual ao valor de yarn.nodemanager.resource.memory-mb   -->
+  </property> 
+  <!-- pode adicionar alocação mínima de memória caso seja necessário-->
+
+  <!-- propriedades para o hadoop não reclamar de memória virtual (comum em docker/wsl2)-->
+  <property>
+    <name>yarn.nodemanager.vmem-check-enabled</name>
+    <value>false</value> <!-- Desabilita a verificação de memória virtual, útil para ambientes como Docker ou WSL2 onde a memória virtual pode ser reportada de forma diferente -->
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.vmem-pmem-ratio</name>
+    <value>2.1</value> <!-- Define a proporção entre memória virtual e física, mas como desabilitamos a verificação, isso não terá efeito -->
+  </property>
+
+  <!-- Configuração de logs agregation para que os logs não fiquem perdidos no datanode/nodemanager
+    Ao rodar yarn logs -applicationId <app_id> ele tenta buscar um arquivo consolidado no hdfs.
+    Estas propriedas irão fazer com que os logs sejam enviados para o hdfs, e não fiquem apenas no datanode/nodemanager, evitando perda de logs importantes para debug 
+  -->
+
+  <property>
+    <name>yarn.log-aggregation-enable</name>
+    <value>true</value> <!-- Habilita a agregação de logs, permitindo que os logs dos containers sejam consolidados e armazenados no HDFS -->
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.remote-app-log-dir</name>
+    <value>/tmp/logs</value> <!-- Diretório no HDFS onde os logs agregados serão armazenados, ajuste conforme necessário para refletir a estrutura do seu ambiente -->
+  </property>
+
+  <property>
+    <name>yarn.log-aggregation.retain-secondes</name>
+    <value>604800</value> <!-- Tempo em segundos para reter os logs agregados (7 dias), ajuste conforme necessário para balancear entre retenção de logs e uso de armazenamento -->
+  </property>
+
+  <!-- 
+    CONFIG PARA JOBHISTRY FUNCIONAR (DEFINIR TAMBÉM NO MAPRED-SITE.XML)
+  <property>
+    <name>yarn.log.server.url</name>
+    <value>http://namenode:19888/jobhistory/logs</value>
+  </property>
+
+    O jobserver tem que ser iniciado manualmente dentro do container (geralmente namenode)
+     # Dentro do container namenode { mapred (dois traços -)daemon start historyserver} 
+  -->
+
+
+</configuration>

@@ -1,0 +1,14 @@
+<configuration>
+  <property>
+    <name>yarn.scheduler.capacity.root.queues</name>
+    <value>default</value> <!-- Define a fila "default" como a única fila de agendamento, ajuste conforme necessário para adicionar mais filas -->
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.root.default.capacity</name>
+    <value>100</value> <!-- Capacidade total da fila "default", ajuste conforme necessário para dividir recursos entre múltiplas filas -->
+  </property>
+  <property>
+    <name>yarn.scheduler.capacity.maximum-applications</name>
+    <value>10000</value> <!-- Limite de aplicações simultâneas no cluster, ajuste conforme necessário para evitar sobrecarga -->
+  </property>
+</configuration>

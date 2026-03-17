@@ -1,0 +1,21 @@
+<configuration>
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://namenode:8020</value>
+  </property> <!--Define o sistema de arquivos padrão para o Hadoop, apontando para o NameNode do HDFS. Ajuste o valor conforme necessário para refletir a configuração do seu cluster. -->
+
+  <property>
+      <name>hadoop.proxyuser.hive.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hive.groups</name>
+      <value>*</value>
+  </property>
+
+</configuration>
+<!-- função do core-site.xml: 
+  define o sistema de arquivos padrão do Hadoop,
+  apontando para o NameNode do HDFS.
+  Esse arquivo é essencial para que os componentes do Hadoop saibam onde encontrar 
+  os dados armazenados no sistema de arquivos distribuído. -->
