@@ -6,18 +6,27 @@
         <name>javax.jdo.option.ConnectionURL</name>
         <value>jdbc:postgresql://hive-postgres:5432/metastore</value>
     </property>
+
     <property>
         <name>javax.jdo.option.ConnectionDriverName</name>
         <value>org.postgresql.Driver</value>
     </property>
+
     <property>
         <name>javax.jdo.option.ConnectionUserName</name>
         <value>hive</value>
     </property>
+
     <property>
         <name>javax.jdo.option.ConnectionPassword</name>
         <value>hive</value>
     </property>
+
+    <property>
+        <name>hive.server2.webui.port</name>
+        <value>10002</value>
+    </property>
+
     <property>
         <name>hive.metastore.db.type</name>
         <value>postgres</value>
@@ -27,6 +36,7 @@
         <name>hive.metastore.warehouse.dir</name>
         <value>hdfs://namenode:8020/user/hive/warehouse</value>
     </property>
+    
     <property>
         <name>hive.exec.scratchdir</name>
         <value>hdfs://namenode:8020/tmp/hive</value>
@@ -36,6 +46,7 @@
         <name>hive.execution.engine</name>
         <value>tez</value>
     </property>
+    
     <property>
         <name>tez.lib.uris</name>
         <value>hdfs://namenode:8020/apps/tez</value>
@@ -45,6 +56,7 @@
         <name>hive.tez.container.size</name>
         <value>1024</value>
     </property>
+    
     <property>
         <name>hive.tez.java.opts</name>
         <value>-Xmx800m</value>

@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <configuration>
     <property>
+        <name>tez.lib.uris</name>
+        <value>hdfs://namenode:8020/apps/tez/</value>
+    </property>
+    <property>
         <name>tez.am.resource.memory.mb</name>
         <value>512</value>
     </property>
